@@ -13,6 +13,9 @@ CCWARNINGS := 	-Wall -Wextra -pedantic -Wcast-align \
 
 CFLAGS := -std=gnu99 $(CCWARNINGS) -O3
 
+CC_TEST_WARNINGS := -Wall -pedantic
+C_TEST_FLAGS := -std=gnu99 $(CC_TEST_WARNINGS) -O3 -D SILENT_ERROR -DASSERT -rdynamic -D_GNU_SOURCE
+
 PROJECT_DIR := $(shell pwd)
 EDIR := $(PROJECT_DIR)/external
 SUBDIR := $(PROJECT_DIR)/submodules
@@ -50,7 +53,7 @@ define print_bin
 	$(if $(Q), @echo "[BIN]     $$(1)")
 endef
 
-all: l1 l2
+all: l1 l2 l3
 
 libs:
 	$(Q)if [ ! -d $(LDIR) ]; then \
@@ -66,11 +69,15 @@ l2: libs
 	$(call print_make,list2)
 	$(Q)$(MAKE) -f $(PROJECT_DIR)/list2/Makefile --no-print-directory
 
+l3: libs
+	$(call print_make,list3)
+	$(Q)$(MAKE) -f $(PROJECT_DIR)/list3/Makefile --no-print-directory
 
 clean:
 	$(call print_info,Cleaning)
 	$(Q)$(MAKE) -f $(PROJECT_DIR)/list1/Makefile clean --no-print-directory
 	$(Q)$(MAKE) -f $(PROJECT_DIR)/list2/Makefile clean --no-print-directory
+	$(Q)$(MAKE) -f $(PROJECT_DIR)/list3/Makefile clean --no-print-directory
 
 clean_libs:
 	$(Q)$(RM) $(EDIR)/*
