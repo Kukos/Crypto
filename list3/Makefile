@@ -21,10 +21,10 @@ LIBS := -lgetch -lcrypto -lfilebuffer
 CFLAGS += -D_GNU_SOURCE
 
 AES_EXEC := $(THIS_DIR)/encryptor.out
-
 AES_TEST := $(THIS_DIR)/aes_test.out
+CPA := $(THIS_DIR)/cpa.out
 
-all: $(AES_EXEC) $(AES_TEST)
+all: $(AES_EXEC) $(AES_TEST) $(CPA)
 
 %.o: %.c
 	$(call print_cc, $<)
@@ -42,7 +42,11 @@ $(AES_EXEC): $(SDIR)/encryptor.o $(AES_OBJS) keytool_helper
 	$(call print_bin, $@)
 	$(Q)$(CC) $(CFLAGS) -L$(LDIR) -I$(IDIR)/aes -I$(EIDIR) $(AES_OBJS) $(SDIR)/encryptor.o $(LIBS) -o $@
 
-$(AES_TEST): $(SDIR)/testtest.o $(AES_TOBJS) keytool_helper
+$(CPA): $(SDIR)/cpa.o $(AES_OBJS)
+	$(call print_bin, $@)
+	$(Q)$(CC) $(CFLAGS) -L$(LDIR) -I$(IDIR)/aes -I$(EIDIR) $(AES_OBJS) $(SDIR)/cpa.o $(LIBS) -o $@
+
+$(AES_TEST): $(SDIR)/testtest.o $(AES_TOBJS)
 	$(call print_bin, $@)
 	$(Q)$(CC) $(C_TEST_FLAGS) -L$(LDIR) -I$(IDIR)/aes -I$(EIDIR) $(AES_TOBJS) $(SDIR)/testtest.o $(LIBS) -o $@
 
@@ -50,8 +54,6 @@ clean:
 	$(call print_info,Cleaning)
 	$(Q)$(RM) $(AES_OBJS)
 	$(Q)$(RM) $(AES_TOBJS)
-	$(Q)$(RM) $(SDIR)/encryptor.o
-	$(Q)$(RM) $(SDIR)/testtest.o
-	$(Q)$(RM) $(AES_EXEC)
-	$(Q)$(RM) $(AES_TEST)
+	$(Q)$(RM) $(SDIR)/*.o
+	$(Q)$(RM) $(THIS_DIR)/*.out
 	$(Q)$(RM) $(KEYTOOL_HELPER_SDIR)/*.class
